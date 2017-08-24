@@ -74,18 +74,22 @@ class Filter:
 
     def __and__(self, x):
         if self.filter['filter']['type'] == 'and':
-            # if `self` is already `and`, don't create a new filter
+            # if `self` is already `and`, don't add another level of nesting
             # but just append `x` to the filter fields.
-            self.filter['filter']['fields'].append(x)
-            return self
+            # Make a copy before appending to not modify the operands
+            fields = self.filter['filter']['fields'].copy()
+            fields.append(x)
+            return Filter(type="and", fields=fields)
         return Filter(type="and", fields=[self, x])
 
     def __or__(self, x):
         if self.filter['filter']['type'] == 'or':
-            # if `self` is already `or`, don't create a new filter
+            # if `self` is already `or`, don't create another level of nesting
             # but just append `x` to the filter fields.
-            self.filter['filter']['fields'].append(x)
-            return self
+            # Make a copy before appending to not modify the operands
+            fields = self.filter['filter']['fields'].copy()
+            fields.append(x)
+            return Filter(type="or", fields=fields)
         return Filter(type="or", fields=[self, x])
 
     def __invert__(self):
